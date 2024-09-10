@@ -1,0 +1,20 @@
+#include <stdbool.h>
+#include "list.h"
+
+
+typedef struct Row {
+    List *values;
+    struct Row *next;
+} Row;
+
+typedef struct {
+    Row *row_0;
+    int rows;
+    int columns;
+} Truth_table;
+
+Row *new_row();
+Truth_table *new_truth_table();
+
+// print_truth_table(Truth_table *tb);
+
