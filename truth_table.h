@@ -1,6 +1,4 @@
-#include <stdbool.h>
 #include "list.h"
-
 
 typedef struct Row {
     List *values;
@@ -14,7 +12,7 @@ typedef struct {
 } Truth_table;
 
 Row *new_row();
-Truth_table *new_truth_table();
-
-// print_truth_table(Truth_table *tb);
+Truth_table *new_truth_table(int rows, int columns);
+void print_row(Row *row);
+void print_truth_table(Truth_table *tb);
 

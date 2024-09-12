@@ -3,11 +3,37 @@
 #include <ctype.h>
 #include "truth_table.h"
 
+int get_number_of_variables(int argc, char *argv[]);
 void check_input(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
     //check_input(argc, argv);
-    Truth_table *tb = new_truth_table();
+    int number_of_variables = get_number_of_variables(argc, argv);
+    printf("Number of variables: %d\n", number_of_variables);
+    //Truth_table *tb = new_truth_table(3, 3);
+    //print_truth_table(tb);
+}
+
+int get_number_of_variables(int argc, char *argv[]) {
+    int letters[26] = {0};
+    int i;
+    for(int word = 1; word < argc; word++) {
+        i = 0;
+        while(argv[word][i] != '\0') {
+            if(islower(argv[word][i])) {
+                letters[(argv[word][i] - 'a')] += 1;
+            }
+            i++;
+        }
+    }
+    
+    int variables = 0;
+    for(int i = 0; i < 26; i++) {
+        // printf("%c: %d\n", 'a'+i, letters[i]); // debug
+        if(letters[i] != 0)
+            variables++;
+    }
+    return variables;
 }
 
 void check_input(int argc, char *argv[]) {
@@ -24,6 +50,7 @@ void check_input(int argc, char *argv[]) {
                 exit(EXIT_FAILURE);
             }
             c++;
+            exit(EXIT_FAILURE);
         }
     }
 }
