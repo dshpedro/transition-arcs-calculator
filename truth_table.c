@@ -11,24 +11,18 @@ Row *new_row() {
 
 Truth_table *new_truth_table(int rows, int columns) {
     Truth_table *tb = malloc(sizeof *tb);
-    tb->row_0 = new_row();
-    tb->rows = 0;
-    tb->columns = 0;
+    tb->first_row = new_row();
+    tb->rows = rows;
+    tb->columns = columns;
     return tb;
 }
 
 void print_row(Row *row) {
-    while(row != NULL) {
-        print_list(row->values);
-        row = row->next;
-    }
+    print_list(row->values);
 }
 
 void print_truth_table(Truth_table *tb) {
-    int rows = tb->rows;
-    
-    printf("A B C\n");
-    Row *curr_row = tb->row_0;
+    Row *curr_row = tb->first_row;
     while(curr_row != NULL) {
         print_row(curr_row);
         curr_row = curr_row->next;

@@ -1,17 +1,26 @@
+#include "truth_table.h"
+#include <ctype.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include "truth_table.h"
 
 int get_number_of_variables(int argc, char *argv[]);
 void check_input(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
     //check_input(argc, argv);
-    int number_of_variables = get_number_of_variables(argc, argv);
-    printf("Number of variables: %d\n", number_of_variables);
-    //Truth_table *tb = new_truth_table(3, 3);
-    //print_truth_table(tb);
+    List *list = new_list();
+    insert_at_start(list, true);
+    insert_at_start(list, true);
+    insert_at_start(list, false);
+    
+    print_list(list);
+
+    int n = get_number_of_variables(argc, argv);
+    n = 2;
+    printf("Number of variables: %d\n", n);
+    Truth_table *tb = new_truth_table(n*n, n);
+    print_truth_table(tb);
 }
 
 int get_number_of_variables(int argc, char *argv[]) {

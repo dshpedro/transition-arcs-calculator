@@ -1,22 +1,31 @@
 #include "list.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 List *new_list() {
     List *list = malloc(sizeof *list);
-    list->value = false;
-    list->next = NULL;
+    list->head = NULL;
     return list;
 }
 
 void print_list(List *list) {
-    while(list != NULL) {
-        if(list->value)
+    Node *curr = list->head;
+    while(curr != NULL) {
+        if(curr->value)
             printf("1");
         else
             printf("0");
-        list = list->next;
+        curr = curr->next;
     }
     printf("\n");
+}
+
+void insert_at_start(List *list, bool value) {
+    if(list != NULL) {
+        Node *new = malloc(sizeof *new);
+        new->value = value;
+        new->next = list->head;
+        list->head = new;
+    }
 }
 

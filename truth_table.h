@@ -6,7 +6,7 @@ typedef struct Row {
 } Row;
 
 typedef struct {
-    Row *row_0;
+    Row *first_row;
     int rows;
     int columns;
 } Truth_table;
