@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+bool get_lsb(int decimal, int shift_ammount) {
+    /* receives a decimal number and the ammount to shift it
+     * returns the LSB of it's binary version
+     */
+    return (decimal >> shift_ammount) & 1;
+}
+
 Row *new_row() {
     Row *row = malloc(sizeof *row);
     row->values = new_list();
@@ -18,10 +25,9 @@ Truth_table *new_truth_table(int rows, int columns) {
     return tb;
 }
 
-void populate_row(Row *row, int counter, int n) {
-    bool lsb = false;
+void populate_row(Row *row, int decimal, int n) {
     for(int i = 0; i < n; i++) {
-        insert_at_start(row->values, lsb);
+        insert_at_start(row->values, get_lsb(decimal, i));
     }
 }
 
@@ -34,6 +40,7 @@ void populate_table(Truth_table *tb) {
         aux_row = new_row();
         curr_row->next = aux_row;
         curr_row = aux_row;
+        counter++;
     }
 }
 
