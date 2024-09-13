@@ -34,13 +34,12 @@ void populate_row(Row *row, int decimal, int n) {
 void populate_table(Truth_table *tb) {
     Row *curr_row = tb->first_row;
     Row *aux_row;
-    int counter = 0;
-    for(int i = 0; i < tb->rows ; i++) {
-        populate_row(curr_row, counter, tb->columns);
+    // dec == decimal
+    for(int dec = 0; dec < tb->rows ; dec++) {
+        populate_row(curr_row, dec, tb->columns);
         aux_row = new_row();
         curr_row->next = aux_row;
         curr_row = aux_row;
-        counter++;
     }
 }
 
