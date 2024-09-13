@@ -8,16 +8,8 @@ int get_number_of_variables(int argc, char *argv[]);
 void check_input(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
-    //check_input(argc, argv);
-    List *list = new_list();
-    insert_at_start(list, true);
-    insert_at_start(list, true);
-    insert_at_start(list, false);
-    
-    print_list(list);
-
     int n = get_number_of_variables(argc, argv);
-    n = 2;
+    n = 4;
     printf("Number of variables: %d\n", n);
     Truth_table *tb = new_truth_table(n*n, n);
     print_truth_table(tb);
