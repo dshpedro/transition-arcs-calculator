@@ -10,6 +10,7 @@ void check_input(int argc, char *argv[]);
 int main(int argc, char *argv[]) {
     int n = get_number_of_variables(argc, argv);
     n = 4;
+    bool truth_table[(int) pow(2, n)][n]; // why didn't I think about this before??
     printf("Number of variables: %d\n", n);
     Truth_table *tb = new_truth_table(pow(2, n), n);
     print_truth_table(tb);
