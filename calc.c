@@ -1,19 +1,16 @@
 #include "truth_table.h"
 #include <ctype.h>
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 char *get_variables(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
     char *variables = get_variables(argc, argv);
-    if(variables == NULL) {
+    if(*variables == '\0') {
         printf("No variables were passed!\n");
         return EXIT_FAILURE;
     }
-    // bool truth_table[(int) pow(2, n)][n]; // why didn't I think about this before??
     Truth_table *tt = new_truth_table(variables);
     print_truth_table(tt);
 }
@@ -39,6 +36,7 @@ char *get_variables(int argc, char *argv[]) {
     }
   
     char *variables = malloc(n * sizeof(char));
+    *variables = '\0';
     n = 0;
     for(int i = 0; i < 26; i++) {
         if(letters[i] != 0) {

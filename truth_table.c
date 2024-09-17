@@ -11,51 +11,41 @@ bool get_lsb(int decimal, int shift_ammount) {
     return (decimal >> shift_ammount) & 1;
 }
 
-Row *new_row() {
-    Row *row = malloc(sizeof *row);
-    row->values = new_list();
-    row->next = NULL;
-    return row;
-}
-
 Truth_table *new_truth_table(char *variables) {
+    Truth_table *tt = malloc(sizeof *tt);
     int n = strlen(variables);
-    Truth_table *tb = malloc(sizeof *tb);
-    tb->first_row = new_row();
-    tb->rows = pow(2, n) ;
-    tb->n = n;
-    populate_table(tb);
-    return tb;
+    
+    tt->n = n;
+    tt->rows = pow(2, n);
+    tt->variables = variables;
+    
+    tt->table = malloc(tt->rows * sizeof(bool *));
+    for(int i = 0; i < tt->rows; i++)
+        tt->table[i] = malloc(n *sizeof(bool));
+
+    populate_table(tt);
+    return tt;
 }
 
-void populate_row(Row *row, int decimal, int n) {
-    for(int i = 0; i < n; i++) {
-        insert_at_start(row->values, get_lsb(decimal, i));
-    }
-}
-
-void populate_table(Truth_table *tb) {
-    Row *curr_row = tb->first_row;
-    Row *aux_row;
+void populate_table(Truth_table *tt) {
     // dec == decimal
-    for(int dec = 0; dec < tb->rows ; dec++) {
-        populate_row(curr_row, dec, tb->n);
-        aux_row = new_row();
-        curr_row->next = aux_row;
-        curr_row = aux_row;
+    for(int dec = 0; dec < tt->rows; dec++) {
+        for(int i = 0; i < tt->n; i++) {
+            tt->table[dec][(tt->n - 1) - i] = get_lsb(dec, i);
+        }
     }
 }
 
-void print_row(Row *row) {
-    print_list(row->values);
-}
-
-void print_truth_table(Truth_table *tb) {
-    printf("%d variables\n", tb->n);
-    Row *curr_row = tb->first_row;
-    while(curr_row != NULL) {
-        print_row(curr_row);
-        curr_row = curr_row->next;
+void print_truth_table(Truth_table *tt) {
+    printf("%s\n", tt->variables);
+    for(int i = 0; i < tt->rows; i++) {
+        for(int j = 0; j < tt->n; j++) {
+            if(tt->table[i][j])
+                printf("1");
+            else
+                printf("0");
+        }
+        printf("\n");
     }
 }
 

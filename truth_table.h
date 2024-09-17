@@ -1,21 +1,14 @@
 #include "list.h"
 
-typedef struct Row {
-    List *values;
-    struct Row *next;
-} Row;
-
 typedef struct {
-    Row *first_row;
-    int rows;
     int n;
+    int rows;
+    char *variables;
+    bool **table;
 } Truth_table;
 
 bool get_lsb(int decimal, int shift_ammount);
-Row *new_row();
 Truth_table *new_truth_table(char *variables);
-void populate_row(Row *row, int decimal, int n);
-void populate_table(Truth_table *tb);
-void print_row(Row *row);
-void print_truth_table(Truth_table *tb);
+void populate_table(Truth_table *tt);
+void print_truth_table(Truth_table *tt);
 
