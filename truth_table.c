@@ -1,6 +1,8 @@
 #include "truth_table.h"
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 bool get_lsb(int decimal, int shift_ammount) {
     /* receives a decimal number and the ammount to shift it
@@ -16,11 +18,12 @@ Row *new_row() {
     return row;
 }
 
-Truth_table *new_truth_table(int rows, int columns) {
+Truth_table *new_truth_table(char *variables) {
+    int n = strlen(variables);
     Truth_table *tb = malloc(sizeof *tb);
     tb->first_row = new_row();
-    tb->rows = rows;
-    tb->columns = columns;
+    tb->rows = pow(2, n) ;
+    tb->n = n;
     populate_table(tb);
     return tb;
 }
@@ -36,7 +39,7 @@ void populate_table(Truth_table *tb) {
     Row *aux_row;
     // dec == decimal
     for(int dec = 0; dec < tb->rows ; dec++) {
-        populate_row(curr_row, dec, tb->columns);
+        populate_row(curr_row, dec, tb->n);
         aux_row = new_row();
         curr_row->next = aux_row;
         curr_row = aux_row;
@@ -48,6 +51,7 @@ void print_row(Row *row) {
 }
 
 void print_truth_table(Truth_table *tb) {
+    printf("%d variables\n", tb->n);
     Row *curr_row = tb->first_row;
     while(curr_row != NULL) {
         print_row(curr_row);
