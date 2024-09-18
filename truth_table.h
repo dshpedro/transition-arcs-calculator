@@ -1,4 +1,4 @@
-#include "list.h"
+#include <stdbool.h>
 
 typedef struct {
     int n;
