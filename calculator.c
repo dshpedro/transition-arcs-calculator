@@ -12,6 +12,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     Truth_table *tt = new_truth_table(variables);
+    evaluate_table(tt, argc, argv);
     print_truth_table(tt);
 }
 
