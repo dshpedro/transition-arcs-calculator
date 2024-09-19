@@ -5,25 +5,23 @@
 #include <stdio.h>
 #include <string.h>
 
-bool not(Truth_table *tt, int row, bool result, char *expression, int index) {
+bool not(Truth_table *tt, int row, char var) {
     /* Assuming all input expressions are on the correct format
      * every '!' will be succeded by a variable, therefore we can evaluate
      * this variable and move 2 positions foward from the '!' operator
      */
-    result = result &&
-             !tt->table[row][get_index_of_var(expression[index], tt)];
+    int i = get_index_of_var(tt, var);
+    bool result = !tt->table[row][i];
     return result;
 }
 
 bool evaluate_expression(Truth_table *tt, int row, char *expression) {
-
     bool result = true; 
     int length = strlen(expression);
     for(int i = 0; i < length; i++) {
         switch (expression[i]) {
             case '!':
-                i++;
-                result = not(tt, row, result, expression, i);
+                result = not(tt, row, expression[++i]);
                 break;
             case '*':
                 // add something here
@@ -35,8 +33,8 @@ bool evaluate_expression(Truth_table *tt, int row, char *expression) {
                     i++; // has the second var
                     char var2 = expression[i];
                     result = result && 
-                             tt->table[row][get_index_of_var(var1, tt)] &&
-                             tt->table[row][get_index_of_var(var2, tt)];
+                             tt->table[row][get_index_of_var(tt, var1)] &&
+                             tt->table[row][get_index_of_var(tt, var2)];
                 }
         }
         // if a subexpression among ANDs is false
@@ -48,7 +46,7 @@ bool evaluate_expression(Truth_table *tt, int row, char *expression) {
     return result;
 }
 
-void evaluate_table(Truth_table *tt, int argc, char *argv[]) {
+void evaluate_table(Truth_table *tt) {
     /* Assuming an input expression with argc == 4, that correctly follows
      * the input format rules specified, we can conclude the following:
      * argv[0] contains the program's name
@@ -61,17 +59,25 @@ void evaluate_table(Truth_table *tt, int argc, char *argv[]) {
      * if we find one that is true, there's no need to check the rest
      * in that row, since the whole will be true
      */
+    char **expressions = tokenize_expression(tt->expression);
+    int n = 0; // ammount of subexpressions
+    while(expressions[n] != NULL)
+        n++;
+    for(int i = 0; i < n; i++) // debug info, prints the minterms
+        printf("%d: %s\n", i, expressions[i]);
+
+    char *subexpression;
     for(int row = 0; row < tt->rows; row++) {
-        for(int i = 1; i < argc; i++) {
-            if(evaluate_expression(tt, row, argv[i])) {
-                tt->table[row][tt->n] = true;
-                break;
+        for(int i = 1; i < n; i++) {
+            subexpression = expressions[i];
+            if(evaluate_expression(tt, row, subexpression)) {
+                tt->table[row][tt->n] = true; break;
             }
         }
     }
 }
 
-int get_index_of_var(char var, Truth_table *tt) {
+int get_index_of_var(Truth_table *tt, char var) {
     /* strchr returns a pointer to the first appearance of
      * var, subtracting it from the pointer to the start
      * yields the correct index of var
@@ -90,13 +96,14 @@ bool get_lsb(int decimal, int shift_ammount) {
     return (decimal >> shift_ammount) & 1;
 }
 
-Truth_table *new_truth_table(char *variables) {
+Truth_table *new_truth_table(char *variables, char *expression) {
     Truth_table *tt = malloc(sizeof *tt);
     int n = strlen(variables);
     
     tt->n = n;
     tt->rows = pow(2, n);
     tt->variables = variables;
+    tt->expression = expression;
     
     /* the mallocs below could be moved to populate_table
      * to eliminate an extra 2^n loop
@@ -106,6 +113,7 @@ Truth_table *new_truth_table(char *variables) {
         tt->table[i] = malloc((n+1) *sizeof(bool));
 
     populate_table(tt);
+    evaluate_table(tt);
     return tt;
 }
 
@@ -130,5 +138,59 @@ void print_truth_table(Truth_table *tt) {
         }
         printf("\n");
     }
+}
+
+char *remove_spaces(char *string) {
+    int not_spaces = 0;
+    char *aux = string;
+    while(*aux != '\0') {
+        if(*aux != ' ')
+            not_spaces++;
+        aux++;
+    }
+    
+    char *new = malloc(not_spaces + 1);
+    aux = new;
+    while(*string != '\0') {
+        if(*string != ' ')
+            *aux++ = *string;
+        string++;
+    }
+    *aux= '\0';
+
+    return new;
+}
+
+char **tokenize_expression(char *expression) {
+    /* Tokenizes SOPs expressions into subexpressions with ANDs and NOTs
+     *
+     * assumes there's atleast one subexpression, aka, the expression itself
+     * this also accounts for adding one more subexpression than there
+     * are + operators, e.g., 'a + b', there's 1 + operator but 2 subexpressions
+     */
+    char *expression_copy = strdup(expression);
+    remove_spaces(expression_copy);
+    int token_count = 1; 
+    while(*expression != '\0') {
+        if(*expression++ == '+')
+            token_count++;
+    }
+
+    char **tokens = malloc((token_count + 1) * sizeof (char *));
+    tokens[token_count] = NULL;
+    if(token_count == 1) {
+        tokens[0] = strdup(expression_copy);
+        free(expression_copy);
+        return tokens;
+    }
+    
+    char *token = strtok(expression_copy, " + ");
+    for(int i = 0; i < token_count; i++) {
+        tokens[i] = strdup(token);
+        token = strtok(NULL, " + ");
+    }
+    free(expression_copy);
+
+    return tokens;
 }
 

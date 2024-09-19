@@ -2,31 +2,25 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-char *get_variables(int argc, char *argv[]);
+char *get_variables(char *expression);
 
 int main(int argc, char *argv[]) {
-    char *variables = get_variables(argc, argv);
-    if(*variables == '\0') {
-        printf("No variables were passed!\n");
-        return EXIT_FAILURE;
-    }
-    Truth_table *tt = new_truth_table(variables);
-    evaluate_table(tt, argc, argv);
+    /* expressions will be passed between
+     * single quotes and stored in argv[1]
+     */
+    char *expression = argv[1];
+    char *variables = get_variables(expression);
+    Truth_table *tt = new_truth_table(variables, expression);
     print_truth_table(tt);
 }
 
-char *get_variables(int argc, char *argv[]) {
+char *get_variables(char *expression) {
     int letters[26] = {0};
-    int i;
-    for(int word = 1; word < argc; word++) {
-        i = 0;
-        while(argv[word][i] != '\0') {
-            if(islower(argv[word][i])) {
-                letters[(argv[word][i] - 'a')] += 1;
-            }
-            i++;
-        }
+    for(int i = 0; i < strlen(expression); i++) {
+        if(islower(expression[i]))
+            letters[(expression[i] - 'a')] += 1;
     }
     
     int n = 0;
