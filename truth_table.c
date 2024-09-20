@@ -5,16 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 
-bool not(Truth_table *tt, int row, char var) {
-    /* Assuming all input expressions are on the correct format
-     * every '!' will be succeded by a variable, therefore we can evaluate
-     * this variable and move 2 positions foward from the '!' operator
-     */
-    int i = get_index_of_var(tt, var);
-    bool result = !tt->table[row][i];
-    return result;
-}
-
 bool evaluate_expression(Truth_table *tt, int row, char *expression) {
     /* We can separate the evaluation in different parts/cases, since
      * the expression can start with either a ! or a lowercase letter
@@ -75,30 +65,24 @@ bool evaluate_expression(Truth_table *tt, int row, char *expression) {
 }
 
 void evaluate_table(Truth_table *tt) {
-    /* Assuming an input expression with argc == 4, that correctly follows
-     * the input format rules specified, we can conclude the following:
-     * argv[0] contains the program's name
-     *
-     * argv[1] contains an expression with ! and/or * operators
-     * argv[2] contains a single + operator 
-     * argv[3] contains an expression with ! and/or * operators
-     * 
-     * therefore we can evaluate each subexpression separatly
-     * if we find one that is true, there's no need to check the rest
-     * in that row, since the whole will be true
+    /* This function will evaluate the table row per row.
+     * To take advantage from the SOP format of the input expression
+     * we will evaluate break the whole expression into minsters and
+     * evaluate each one separatly, if we find one that is true, there's 
+     * no need to check the rest in that row, since infer the whole will be true
      */
-    char **expressions = tokenize_expression(tt->expression);
-    int n = 0; // ammount of subexpressions
+    char **expressions = get_minterms(tt->expression);
+    int n = 0; // ammount of minterms;
     while(expressions[n] != NULL)
         n++;
     for(int i = 0; i < n; i++) // debug info, prints the minterms
         printf("%d: %s\n", i, expressions[i]);
 
-    char *subexpression;
+    char *minterm;
     for(int row = 0; row < tt->rows; row++) {
         for(int i = 0; i < n; i++) {
-            subexpression = expressions[i];
-            if(evaluate_expression(tt, row, subexpression)) {
+            minterm = expressions[i];
+            if(evaluate_expression(tt, row, minterm)) {
                 tt->table[row][tt->n] = true;
                 break;
             }
@@ -146,6 +130,41 @@ Truth_table *new_truth_table(char *variables, char *expression) {
     return tt;
 }
 
+char **get_minterms(char *expression) {
+    /* Tokenizes the SOP expression into it's minterms,
+     * subexpressions with only ANDs and NOTs
+     *
+     * assumes there's atleast one minterm, aka, the expression itself
+     * this also accounts for adding one more minterm than there
+     * are + operators, e.g., 'a + b', there's 1 + operator but 2 minterms 
+     */
+    char *expression_copy = strdup(expression);
+    int token_count = 1; 
+    while(*expression != '\0') {
+        if(*expression++ == '+')
+            token_count++;
+    }
+
+    char **minterms = malloc((token_count + 1) * sizeof (char *));
+    minterms[token_count] = NULL;
+    if(token_count == 1) {
+        minterms[0] = strdup(expression_copy);
+        free(expression_copy);
+        return minterms;
+    }
+    
+    // any combination of ' ' and '+' will be considered a delimiter
+    char *delim = " +"; 
+    char *token = strtok(expression_copy, delim);
+    for(int i = 0; i < token_count; i++) {
+        minterms[i] = strdup(token);
+        token = strtok(NULL, delim);
+    }
+    free(expression_copy);
+
+    return minterms;
+}
+
 void populate_table(Truth_table *tt) {
     // dec == decimal
     for(int dec = 0; dec < tt->rows; dec++) {
@@ -167,59 +186,5 @@ void print_truth_table(Truth_table *tt) {
         }
         printf("\n");
     }
-}
-
-char *remove_spaces(char *string) {
-    int not_spaces = 0;
-    char *aux = string;
-    while(*aux != '\0') {
-        if(*aux != ' ')
-            not_spaces++;
-        aux++;
-    }
-    
-    char *new = malloc(not_spaces + 1);
-    aux = new;
-    while(*string != '\0') {
-        if(*string != ' ')
-            *aux++ = *string;
-        string++;
-    }
-    *aux= '\0';
-
-    return new;
-}
-
-char **tokenize_expression(char *expression) {
-    /* Tokenizes SOPs expressions into subexpressions with ANDs and NOTs
-     *
-     * assumes there's atleast one subexpression, aka, the expression itself
-     * this also accounts for adding one more subexpression than there
-     * are + operators, e.g., 'a + b', there's 1 + operator but 2 subexpressions
-     */
-    char *expression_copy = strdup(expression);
-    remove_spaces(expression_copy);
-    int token_count = 1; 
-    while(*expression != '\0') {
-        if(*expression++ == '+')
-            token_count++;
-    }
-
-    char **tokens = malloc((token_count + 1) * sizeof (char *));
-    tokens[token_count] = NULL;
-    if(token_count == 1) {
-        tokens[0] = strdup(expression_copy);
-        free(expression_copy);
-        return tokens;
-    }
-    
-    char *token = strtok(expression_copy, " + ");
-    for(int i = 0; i < token_count; i++) {
-        tokens[i] = strdup(token);
-        token = strtok(NULL, " + ");
-    }
-    free(expression_copy);
-
-    return tokens;
 }
 
