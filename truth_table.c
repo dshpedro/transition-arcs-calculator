@@ -16,31 +16,59 @@ bool not(Truth_table *tt, int row, char var) {
 }
 
 bool evaluate_expression(Truth_table *tt, int row, char *expression) {
+    /* We can separate the evaluation in different parts/cases, since
+     * the expression can start with either a ! or a lowercase letter
+     * we have:
+     * part 1: evaluate the NOT or value of the variable in the truth table,
+     * therefore this part has 2 cases '!' and 'islower'
+     *
+     * part 2: we can then search for an '*' operator to make an AND with the
+     * previous result. This part will have 2 cases aswell, we can either find
+     * a lowercase letter or a '!' operator after the '*'
+     */
     bool result = true; 
+    int i = 0;
+    char var;
+    int var_index;
+
+    // Part 1
+    if(*expression == '!') { // Case 1
+        var = expression[++i]; // after ! there should be a lowercase letter, a variable
+        var_index = get_index_of_var(tt, var);
+        result = result && !tt->table[row][var_index];
+    }
+    else if (islower(*expression)) { // Case 2
+        var = expression[i];
+        var_index = get_index_of_var(tt, var);
+        result = result && tt->table[row][var_index];
+    }
+    // for the current i, expression[i] contains a lowercase letter
+    
+    // Part 2
+    i++; // now expression[i] contains an '*'
     int length = strlen(expression);
-    for(int i = 0; i < length; i++) {
-        switch (expression[i]) {
-            case '!':
-                result = not(tt, row, expression[++i]);
-                break;
-            case '*':
-                // add something here
-                break;
-            default:
-                if(islower(expression[i])) {
-                    char var1 = expression[i];
-                    i++; // has '*' 
-                    i++; // has the second var
-                    char var2 = expression[i];
-                    result = result && 
-                             tt->table[row][get_index_of_var(tt, var1)] &&
-                             tt->table[row][get_index_of_var(tt, var2)];
-                }
-        }
-        // if a subexpression among ANDs is false
-        // the final result will also be false
+    while(i < length) {
+        /* if a subexpression among ANDs is false
+         * then the final result will also be false
+         */
         if(result == false)
             return false;
+      
+        i++; // expression[i] is now either '!' or a lowercase letter
+        if(expression[i] == '!') { // Case 1
+            // after ! there should be a lowercase letter, a variable
+            var = expression[++i]; 
+            var_index = get_index_of_var(tt, var);
+            result = result && !tt->table[row][var_index];
+        }
+        else if(islower(expression[i])) { // Case 2
+            var = expression[i];
+            var_index = get_index_of_var(tt, var);
+            result = result && tt->table[row][var_index];
+        }
+        // for the current i, expression[i] contains a lowercase letter
+
+      i++; // expression[i] is now an '*'
     }
 
     return result;
@@ -68,10 +96,11 @@ void evaluate_table(Truth_table *tt) {
 
     char *subexpression;
     for(int row = 0; row < tt->rows; row++) {
-        for(int i = 1; i < n; i++) {
+        for(int i = 0; i < n; i++) {
             subexpression = expressions[i];
             if(evaluate_expression(tt, row, subexpression)) {
-                tt->table[row][tt->n] = true; break;
+                tt->table[row][tt->n] = true;
+                break;
             }
         }
     }
