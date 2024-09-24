@@ -5,88 +5,68 @@
 #include <stdio.h>
 #include <string.h>
 
-bool evaluate_expression(Truth_table *tt, int row, char *expression) {
-    /* We can separate the evaluation in different parts/cases, since
-     * the expression can start with either a ! or a lowercase letter
-     * we have:
-     * part 1: evaluate the NOT or value of the variable in the truth table,
-     * therefore this part has 2 cases '!' and 'islower'
+bool evaluate_minterm(Truth_table *tt, int row, char *minterm) {
+    /* *consider elementary subexpressions as those composed by
+     *  a single variable, such as 'a' or '!a'
      *
-     * part 2: we can then search for an '*' operator to make an AND with the
-     * previous result. This part will have 2 cases aswell, we can either find
-     * a lowercase letter or a '!' operator after the '*'
+     * Minterms will consist of one or more *elementary subexpressions
+     * interconnected by ANDs.
+     *
+     * By logic: 
+     *  If one of the elementary subexpressions evaluate to false then
+     *    the minterm must also evaluate to false.
+     *  If all elementary subexpressions evaluate to true then
+     *    the minterm must also evaluate to true.
+     *
+     * This function iterates through the minterm and evaluates every 
+     * elementary subexpression it finds, until one of the two conditions
+     * listed previously is met, determining it's return value.
      */
     bool result = true; 
-    int i = 0;
     char var;
     int var_index;
-
-    // Part 1
-    if(*expression == '!') { // Case 1
-        var = expression[++i]; // after ! there should be a lowercase letter, a variable
-        var_index = get_index_of_var(tt, var);
-        result = result && !tt->table[row][var_index];
-    }
-    else if (islower(*expression)) { // Case 2
-        var = expression[i];
-        var_index = get_index_of_var(tt, var);
-        result = result && tt->table[row][var_index];
-    }
-    // for the current i, expression[i] contains a lowercase letter
     
-    // Part 2
-    i++; // now expression[i] contains an '*'
-    int length = strlen(expression);
-    while(i < length) {
-        /* if a subexpression among ANDs is false
-         * then the final result will also be false
-         */
+    int length = strlen(minterm);
+    for(int i = 0; i < length; i++) {
         if(result == false)
             return false;
-      
-        i++; // expression[i] is now either '!' or a lowercase letter
-        if(expression[i] == '!') { // Case 1
+        else if(minterm[i] == '!') { // Case 1
             // after ! there should be a lowercase letter, a variable
-            var = expression[++i]; 
+            var = minterm[++i]; 
             var_index = get_index_of_var(tt, var);
             result = result && !tt->table[row][var_index];
         }
-        else if(islower(expression[i])) { // Case 2
-            var = expression[i];
+        else if(islower(minterm[i])) { // Case 2
+            var = minterm[i];
             var_index = get_index_of_var(tt, var);
             result = result && tt->table[row][var_index];
         }
-        // for the current i, expression[i] contains a lowercase letter
-
-      i++; // expression[i] is now an '*'
+        // at the next i++ we will skip the '*' char
     }
-
     return result;
 }
 
 void evaluate_table(Truth_table *tt) {
     /* This function will evaluate the table row per row.
      * To take advantage from the SOP format of the input expression
-     * we will evaluate break the whole expression into minsters and
-     * evaluate each one separatly, if we find one that is true, there's 
-     * no need to check the rest in that row, since infer the whole will be true
+     * we will break the whole expression into minterms and evaluate
+     * each one separatly, if we find one that is true, there's no need
+     * to check the rest in that row, since infer the whole will be true
      */
-    char **expressions = get_minterms(tt->expression);
+    char **minterms = get_minterms(tt->expression);
     int n = 0; // ammount of minterms;
-    while(expressions[n] != NULL)
+    while(minterms[n] != NULL)
         n++;
     
     // debug info, prints the minterms
     printf("SOP Minterms:\n");
     for(int i = 0; i < n; i++) 
-        printf("%d: %s\n", i, expressions[i]);
+        printf("%d: %s\n", i, minterms[i]);
     printf("\n");
 
-    char *minterm;
     for(int row = 0; row < tt->rows; row++) {
         for(int i = 0; i < n; i++) {
-            minterm = expressions[i];
-            if(evaluate_expression(tt, row, minterm)) {
+            if(evaluate_minterm(tt, row, minterms[i])) {
                 tt->table[row][tt->n] = true;
                 break;
             }

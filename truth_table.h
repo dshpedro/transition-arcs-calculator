@@ -8,7 +8,7 @@ typedef struct {
     bool **table;
 } Truth_table;
 
-bool evaluate_expression(Truth_table *tt, int row, char *expression);
+bool evaluate_minterm(Truth_table *tt, int row, char *minterm);
 void evaluate_table(Truth_table *tt);
 int get_index_of_var(Truth_table *tt, char var);
 bool get_lsb(int decimal, int shift_ammount);
