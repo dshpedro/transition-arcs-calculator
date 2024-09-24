@@ -75,8 +75,12 @@ void evaluate_table(Truth_table *tt) {
     int n = 0; // ammount of minterms;
     while(expressions[n] != NULL)
         n++;
-    for(int i = 0; i < n; i++) // debug info, prints the minterms
+    
+    // debug info, prints the minterms
+    printf("SOP Minterms:\n");
+    for(int i = 0; i < n; i++) 
         printf("%d: %s\n", i, expressions[i]);
+    printf("\n");
 
     char *minterm;
     for(int row = 0; row < tt->rows; row++) {
@@ -176,15 +180,20 @@ void populate_table(Truth_table *tt) {
 }
 
 void print_truth_table(Truth_table *tt) {
-    printf("%sS\n", tt->variables);
+    printf("Truth table:\n");
+    printf("%s|S\n", tt->variables);
     for(int i = 0; i < tt->rows; i++) {
-        for(int j = 0; j <= tt->n; j++) {
+        for(int j = 0; j < tt->n; j++) {
             if(tt->table[i][j])
                 printf("1");
             else
                 printf("0");
         }
-        printf("\n");
+        // print result (S)
+        if(tt->table[i][tt->n])
+            printf("|1\n");
+        else
+            printf("|0\n");
     }
 }
 
