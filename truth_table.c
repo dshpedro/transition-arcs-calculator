@@ -54,16 +54,9 @@ void evaluate_table(Truth_table *tt) {
      * to check the rest in that row, since infer the whole will be true
      */
     char **minterms = get_minterms(tt->expression);
-    int n = 0; // ammount of minterms;
-    while(minterms[n] != NULL)
-        n++;
+    int n; // ammount of minterms;
+    for(n = 0; minterms[n] != NULL; n++);
     
-    // debug info, prints the minterms
-    printf("SOP Minterms:\n");
-    for(int i = 0; i < n; i++) 
-        printf("%d: %s\n", i, minterms[i]);
-    printf("\n");
-
     for(int row = 0; row < tt->rows; row++) {
         for(int i = 0; i < n; i++) {
             if(evaluate_minterm(tt, row, minterms[i])) {
@@ -157,6 +150,17 @@ void populate_table(Truth_table *tt) {
         }
         tt->table[dec][tt->n] = false; // defaults the S (result) to false
     }
+}
+
+void print_minterms(Truth_table *tt) {
+    char **minterms = get_minterms(tt->expression);
+    int n; // ammount of minterms;
+    for(n = 0; minterms[n] != NULL; n++);
+    
+    printf("SOP Minterms:\n");
+    for(int i = 0; i < n; i++) 
+        printf("%d: %s\n", i, minterms[i]);
+    printf("\n");
 }
 
 void print_truth_table(Truth_table *tt) {
