@@ -1,4 +1,14 @@
 #include "utils.h"
+#include <stdio.h>
+
+bool is_input_valid(int argc, char *argv[]) {
+    if(argv[1] != NULL)
+        return true;
+    else {
+        printf("Invalid input!\n");
+        return false;
+    }
+}
 
 char *get_variables(char *expression) {
     int letters[26] = {0};
