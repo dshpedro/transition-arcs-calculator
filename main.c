@@ -1,4 +1,4 @@
-#include "truth_table.h"
+#include "calculator.h"
 #include "utils.h"
 
 int main(int argc, char *argv[]) {
@@ -13,6 +13,9 @@ int main(int argc, char *argv[]) {
     Truth_table *tt = new_truth_table(variables, expression);
     print_minterms(tt);
     print_truth_table(tt);
+
+    List *arcs = calculate_arcs(tt);
+    print_list(arcs);
 
     return 0;
 }
