@@ -4,10 +4,16 @@ LDFLAGS = -lm
 
 all: a.out
 
-a.out: main.o truth_table.o utils.o
-		$(CC) main.o truth_table.o utils.o $(LDFLAGS) -o a.out
+a.out: main.o calculator.o list.o truth_table.o utils.o
+		$(CC) main.o calculator.o list.o truth_table.o utils.o $(LDFLAGS) -o a.out
 
-main.o: main.c truth_table.h utils.h
+calculator.o: calculator.c calculator.h list.h truth_table.h
+		$(CC) $(CFLAGS) calculator.c
+
+list.o: list.c list.h
+		$(CC) $(CFLAGS) list.c
+
+main.o: main.c calculator.h list.h truth_table.h utils.h
 		$(CC) $(CFLAGS) main.c
 
 truth_table.o: truth_table.c truth_table.h
