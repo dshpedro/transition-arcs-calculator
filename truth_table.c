@@ -164,7 +164,7 @@ void print_minterms(Truth_table *tt) {
 }
 
 void print_truth_table(Truth_table *tt) {
-    printf("Truth table:\n");
+    printf("Truth Table:\n");
     printf("%s|S\n", tt->variables);
     for(int i = 0; i < tt->rows; i++) {
         for(int j = 0; j < tt->n; j++) {
