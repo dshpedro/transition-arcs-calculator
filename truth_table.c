@@ -179,5 +179,6 @@ void print_truth_table(Truth_table *tt) {
         else
             printf("|0\n");
     }
+    printf("\n");
 }
 
