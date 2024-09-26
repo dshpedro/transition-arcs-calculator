@@ -54,13 +54,15 @@ void evaluate_table(Truth_table *tt) {
      * to check the rest in that row, since infer the whole will be true
      */
     char **minterms = get_minterms(tt->expression);
-    int n; // ammount of minterms;
-    for(n = 0; minterms[n] != NULL; n++);
+    int n_min; // ammount of minterms;
+    for(n_min = 0; minterms[n_min] != NULL; n_min++);
     
-    for(int row = 0; row < tt->rows; row++) {
-        for(int i = 0; i < n; i++) {
+    int result_column = tt->amount_of_variables;
+    int amount_of_rows = tt->amount_of_rows;
+    for(int row = 0; row < amount_of_rows; row++) {
+        for(int i = 0; i < n_min; i++) {
             if(evaluate_minterm(tt, row, minterms[i])) {
-                tt->table[row][tt->n] = true;
+                tt->table[row][result_column] = true;
                 break;
             }
         }
@@ -89,18 +91,19 @@ bool get_lsb(int decimal, int shift_ammount) {
 Truth_table *new_truth_table(char *variables, char *expression) {
     Truth_table *tt = malloc(sizeof *tt);
     int n = strlen(variables);
+    int amount_of_rows = pow(2, n);
     
-    tt->n = n;
-    tt->rows = pow(2, n);
+    tt->amount_of_variables = n;
+    tt->amount_of_rows = amount_of_rows;
     tt->variables = variables;
     tt->expression = expression;
     
     /* the mallocs below could be moved to populate_table
      * to eliminate an extra 2^n loop
      */
-    tt->table = malloc(tt->rows * sizeof(bool *));
-    for(int i = 0; i < tt->rows; i++)
-        tt->table[i] = malloc((n+1) *sizeof(bool));
+    tt->table = malloc(amount_of_rows * sizeof(bool *));
+    for(int row = 0; row < amount_of_rows; row++)
+        tt->table[row] = malloc((n+1) *sizeof(bool));
 
     populate_table(tt);
     evaluate_table(tt);
@@ -143,12 +146,14 @@ char **get_minterms(char *expression) {
 }
 
 void populate_table(Truth_table *tt) {
+    int n = tt->amount_of_variables; // == result column index
+    int amount_of_rows = tt->amount_of_rows;
     // dec == decimal
-    for(int dec = 0; dec < tt->rows; dec++) {
-        for(int i = 0; i < tt->n; i++) {
-            tt->table[dec][(tt->n - 1) - i] = get_lsb(dec, i);
+    for(int dec = 0; dec < amount_of_rows; dec++) {
+        for(int i = 0; i < n; i++) {
+            tt->table[dec][(n - 1) - i] = get_lsb(dec, i);
         }
-        tt->table[dec][tt->n] = false; // defaults the S (result) to false
+        tt->table[dec][n] = false; // defaults the S (result) to false
     }
 }
 
@@ -164,17 +169,20 @@ void print_minterms(Truth_table *tt) {
 }
 
 void print_truth_table(Truth_table *tt) {
+    int amount_of_rows = tt->amount_of_rows;
+    int last_col = tt->amount_of_variables;
+
     printf("Truth Table:\n");
     printf("%s|S\n", tt->variables);
-    for(int i = 0; i < tt->rows; i++) {
-        for(int j = 0; j < tt->n; j++) {
-            if(tt->table[i][j])
+    for(int row = 0; row < amount_of_rows; row++) {
+        for(int col = 0; col < last_col; col++) {
+            if(tt->table[row][col])
                 printf("1");
             else
                 printf("0");
         }
         // print result (S)
-        if(tt->table[i][tt->n])
+        if(tt->table[row][last_col])
             printf("|1\n");
         else
             printf("|0\n");

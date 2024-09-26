@@ -1,8 +1,8 @@
 #include <stdbool.h>
 
 typedef struct {
-    int n;
-    int rows;
+    int amount_of_variables;
+    int amount_of_rows;
     char *expression;
     char *variables;
     bool **table;
