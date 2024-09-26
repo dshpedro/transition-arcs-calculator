@@ -1,11 +1,12 @@
 CC = gcc
 CFLAGS = -Wall -c -g
 LDFLAGS = -lm
+TARGET = arcs.out
 
-all: a.out
+all: $(TARGET)
 
-a.out: main.o calculator.o list.o truth_table.o utils.o
-		$(CC) main.o calculator.o list.o truth_table.o utils.o $(LDFLAGS) -o a.out
+$(TARGET): main.o calculator.o list.o truth_table.o utils.o
+		$(CC) main.o calculator.o list.o truth_table.o utils.o $(LDFLAGS) -o $(TARGET)
 
 calculator.o: calculator.c calculator.h list.h truth_table.h
 		$(CC) $(CFLAGS) calculator.c
@@ -23,5 +24,5 @@ utils.o: utils.c utils.h
 		$(CC) $(CFLAGS) utils.c
 
 clean:
-		rm -f *.o a.out
+		rm -f *.o *.out
 
