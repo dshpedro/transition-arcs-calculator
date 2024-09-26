@@ -5,6 +5,15 @@ char bool_to_char(bool value) {
     return value ? '1' : '0';
 }
 
+bool is_debug_mode(int argc, char *argv[]) {
+    if(argc < 3)
+        return false;
+    if(strcmp(argv[2], "-d") == 0)
+        return true;
+    else
+        return false;
+}
+
 bool is_input_valid(int argc, char *argv[]) {
     if(argv[1] != NULL)
         return true;

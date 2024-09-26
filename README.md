@@ -7,6 +7,8 @@ Calculates transition arcs for a given SOP expression.
 ## Input
 - To input an expression `x`, use the command:
 `./arcs.out 'x'`
+- You can also use an optional `-d` debug flag after the expression `x` to print the minterms and the truth table. For example:
+`./arcs.out 'x' -d`
 
 ### Input characters
 - **Variables**: a-z (must be in lowercase)

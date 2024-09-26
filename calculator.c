@@ -42,7 +42,6 @@ List *calculate_arcs(Truth_table *tt) {
      * it's value is 0, and compare it with it's pair of Hamming distance 1.
      */
     List *arcs = new_list();
-    insert_at_end(arcs, "Transition Arcs:");
 
     // characteristics discussed at the top comment
     int consecutives;                // number of consecutives 0's
