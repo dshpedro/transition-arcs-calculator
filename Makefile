@@ -1,9 +1,12 @@
 CC = gcc
-CFLAGS = -Wall -c -g
+CFLAGS = -Wall -c
 LDFLAGS = -lm
 TARGET = arcs.out
 
 all: $(TARGET)
+
+debug: CFLAGS += -g
+debug: $(TARGET)
 
 $(TARGET): main.o calculator.o list.o truth_table.o utils.o
 		$(CC) main.o calculator.o list.o truth_table.o utils.o $(LDFLAGS) -o $(TARGET)
