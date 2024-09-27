@@ -22,3 +22,6 @@ Calculates transition arcs for a given SOP expression.
 ### SOP expressions
 - The input expression has to be in a Summ Of Products format.
 
+## Testing the program
+You can compare this program's output to another that follows the same format by correctly updating the names of the programs in the `compare_to_reference` script and running it.
+
